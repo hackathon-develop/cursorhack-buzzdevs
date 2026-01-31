@@ -1,0 +1,9 @@
+{
+  "airports": [
+    {
+      "id": "demo_airport",
+      "name": "Demo Airport (Fictional)",
+      "path": "./demo_airport/manifest.json"
+    }
+  ]
+}

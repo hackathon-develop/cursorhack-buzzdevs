@@ -1,0 +1,276 @@
+{
+  "image": {
+    "width": 2000,
+    "height": 1200
+  },
+  "nodes": [
+    {
+      "id": "F2_CORE",
+      "x": 1120,
+      "y": 600,
+      "type": "vertical_core"
+    },
+    {
+      "id": "F2_A",
+      "x": 900,
+      "y": 600,
+      "type": "corridor"
+    },
+    {
+      "id": "F2_B",
+      "x": 700,
+      "y": 600,
+      "type": "corridor"
+    },
+    {
+      "id": "F2_C",
+      "x": 500,
+      "y": 600,
+      "type": "corridor_end"
+    },
+    {
+      "id": "F2_D",
+      "x": 1400,
+      "y": 600,
+      "type": "corridor"
+    },
+    {
+      "id": "F2_E",
+      "x": 1700,
+      "y": 600,
+      "type": "corridor_end"
+    },
+    {
+      "id": "F2_NORTH",
+      "x": 1000,
+      "y": 520,
+      "type": "corridor"
+    },
+    {
+      "id": "F2_SOUTH",
+      "x": 1000,
+      "y": 680,
+      "type": "corridor"
+    },
+    {
+      "id": "F2_G01",
+      "x": 435,
+      "y": 320,
+      "type": "gate"
+    },
+    {
+      "id": "F2_G02",
+      "x": 645,
+      "y": 320,
+      "type": "gate"
+    },
+    {
+      "id": "F2_G03",
+      "x": 855,
+      "y": 320,
+      "type": "gate"
+    },
+    {
+      "id": "F2_G04",
+      "x": 1145,
+      "y": 320,
+      "type": "gate"
+    },
+    {
+      "id": "F2_G05",
+      "x": 1355,
+      "y": 320,
+      "type": "gate"
+    },
+    {
+      "id": "F2_G06",
+      "x": 1565,
+      "y": 320,
+      "type": "gate"
+    },
+    {
+      "id": "F2_WC2",
+      "x": 830,
+      "y": 940,
+      "type": "toilet"
+    },
+    {
+      "id": "F2_WC3",
+      "x": 1000,
+      "y": 940,
+      "type": "toilet"
+    },
+    {
+      "id": "F2_BAK2",
+      "x": 1200,
+      "y": 940,
+      "type": "bakery"
+    },
+    {
+      "id": "F2_RES2",
+      "x": 1490,
+      "y": 940,
+      "type": "restaurant"
+    },
+    {
+      "id": "F2_LOUNGE",
+      "x": 1565,
+      "y": 520,
+      "type": "lounge"
+    },
+    {
+      "id": "F2_ELEV",
+      "x": 1170,
+      "y": 540,
+      "type": "elevator"
+    },
+    {
+      "id": "F2_STAIRS",
+      "x": 1180,
+      "y": 720,
+      "type": "stairs"
+    }
+  ],
+  "edges": [
+    {
+      "from": "F2_CORE",
+      "to": "F2_A",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 220.0
+    },
+    {
+      "from": "F2_A",
+      "to": "F2_B",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 200.0
+    },
+    {
+      "from": "F2_B",
+      "to": "F2_C",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 200.0
+    },
+    {
+      "from": "F2_CORE",
+      "to": "F2_D",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 280.0
+    },
+    {
+      "from": "F2_D",
+      "to": "F2_E",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 300.0
+    },
+    {
+      "from": "F2_A",
+      "to": "F2_NORTH",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 128.06
+    },
+    {
+      "from": "F2_A",
+      "to": "F2_SOUTH",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 128.06
+    },
+    {
+      "from": "F2_C",
+      "to": "F2_G01",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 287.45
+    },
+    {
+      "from": "F2_B",
+      "to": "F2_G02",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 285.35
+    },
+    {
+      "from": "F2_A",
+      "to": "F2_G03",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 283.59
+    },
+    {
+      "from": "F2_CORE",
+      "to": "F2_G04",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 281.11
+    },
+    {
+      "from": "F2_D",
+      "to": "F2_G05",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 283.59
+    },
+    {
+      "from": "F2_E",
+      "to": "F2_G06",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 310.85
+    },
+    {
+      "from": "F2_SOUTH",
+      "to": "F2_WC2",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 310.64
+    },
+    {
+      "from": "F2_SOUTH",
+      "to": "F2_WC3",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 260.0
+    },
+    {
+      "from": "F2_SOUTH",
+      "to": "F2_BAK2",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 328.02
+    },
+    {
+      "from": "F2_D",
+      "to": "F2_RES2",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 351.71
+    },
+    {
+      "from": "F2_D",
+      "to": "F2_LOUNGE",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 183.37
+    },
+    {
+      "from": "F2_CORE",
+      "to": "F2_ELEV",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 78.1
+    },
+    {
+      "from": "F2_CORE",
+      "to": "F2_STAIRS",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 134.16
+    }
+  ]
+}
