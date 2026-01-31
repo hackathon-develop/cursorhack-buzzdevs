@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+<div class="ad-container" style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: white; min-height: 100vh;">
+    {% image page.hero_image fill-1920x600 as hero %}
+    {% if hero %}
+    <div class="hero" style="background-image: url('{{ hero.url }}'); height: 50vh; background-size: cover; background-position: center; position: relative;">
+        <div class="overlay" style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent, #0f172a);"></div>
+        <div class="container" style="position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); text-align: center; width: 90%;">
+             <h1 style="font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; text-shadow: 0 4px 6px rgba(0,0,0,0.5); margin-bottom: 1rem;">{{ page.title }}</h1>
+             <span class="badge" style="background: rgba(59, 130, 246, 0.9); color: white; padding: 0.5rem 1.5rem; border-radius: 9999px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.875rem; backdrop-filter: blur(4px);">{{ page.target_audience }}</span>
+        </div>
+    </div>
+    {% else %}
+    <div class="hero-fallback" style="height: 30vh; background: linear-gradient(135deg, #1e293b, #0f172a); position: relative; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 3rem;">
+        <div class="container" style="text-align: center;">
+             <h1 style="font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; margin-bottom: 1rem;">{{ page.title }}</h1>
+             <span class="badge" style="background: #3b82f6; color: white; padding: 0.5rem 1.5rem; border-radius: 9999px; font-weight: 600; text-transform: uppercase;">{{ page.target_audience }}</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="content max-w-4xl mx-auto py-12 px-6" style="max-width: 800px; margin: 0 auto; padding: 4rem 1.5rem;">
+        <div class="prose prose-invert prose-lg" style="line-height: 1.8; font-size: 1.125rem; color: #cbd5e1;">
+            {{ page.body|richtext }}
+        </div>
+
+        {% if page.cta_url %}
+        <div class="cta mt-12 text-center" style="margin-top: 4rem; text-align: center;">
+            <a href="{{ page.cta_url }}" style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); padding: 1.25rem 3.5rem; border-radius: 9999px; color: white; font-weight: 700; text-decoration: none; font-size: 1.25rem; transition: transform 0.2s; display: inline-block; box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);">
+                {{ page.cta_text }}
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

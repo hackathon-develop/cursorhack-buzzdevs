@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+<div class="template-detail-container"
+    style="font-family: 'Inter', 'Segoe UI', sans-serif; background: #0f172a; color: white; min-height: 100vh;">
+
+    {% image page.hero_image fill-1920x800 as hero %}
+    {% if hero %}
+    <div class="hero"
+        style="background-image: url('{{ hero.url }}'); height: 60vh; background-size: cover; background-position: center; position: relative;">
+        <!-- Gradient Overlay -->
+        <div class="overlay"
+            style="position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 0%, #0f172a 100%), linear-gradient(to right, rgba(15, 23, 42, 0.5) 0%, transparent 100%);">
+        </div>
+
+        <div class="container"
+            style="position: absolute; bottom: 8rem; left: 50%; transform: translateX(-50%); width: 90%; max-width: 1200px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 2rem;">
+
+            <div class="hero-content" style="flex: 1; min-width: 300px;">
+                <div class="badge mb-4" style="margin-bottom: 1rem;">
+                    <span
+                        style="background: rgba(51, 65, 85, 0.8); backdrop-filter: blur(8px); padding: 0.5rem 1rem; border-radius: 9999px; font-weight: 600; font-size: 0.875rem; color: #e2e8f0; border: 1px solid rgba(255,255,255,0.1);">{{
+                        page.industry.name }} Template</span>
+                </div>
+                <h1
+                    style="font-size: clamp(3rem, 6vw, 5rem); font-weight: 800; line-height: 1.1; margin-bottom: 1rem; text-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+                    {{ page.title }}</h1>
+                <p
+                    style="font-size: 1.25rem; color: #cbd5e1; max-width: 600px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                    A premium, fully responsive template designed for high-conversion {{ page.industry.name|lower }}
+                    campaigns.</p>
+            </div>
+
+            <div class="price-action"
+                style="background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); padding: 1.5rem; border-radius: 1rem; border: 1px solid rgba(255, 255, 255, 0.1); min-width: 250px;">
+                <div style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 0.25rem;">One-time purchase</div>
+                <div style="font-size: 2.5rem; font-weight: 800; color: white; margin-bottom: 1rem;">${{ page.price }}
+                </div>
+                <button
+                    style="width: 100%; background: #60a5fa; color: white; padding: 1rem; border: none; border-radius: 0.5rem; font-weight: 700; font-size: 1.125rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(96, 165, 250, 0.3);">
+                    Buy Now
+                </button>
+            </div>
+
+        </div>
+    </div>
+    {% else %}
+    <div class="hero-fallback"
+        style="height: 40vh; background: linear-gradient(135deg, #1e293b, #0f172a); display: flex; align-items: center; justify-content: center;">
+        <h1 style="font-size: 4rem; font-weight: 800;">{{ page.title }}</h1>
+    </div>
+    {% endif %}
+
+    <div class="main-content"
+        style="max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; display: grid; grid-template-columns: 2fr 1fr; gap: 4rem;">
+
+        <div class="left-content">
+            <h2
+                style="font-size: 2rem; font-weight: 700; margin-bottom: 1.5rem; border-bottom: 1px solid #334155; padding-bottom: 1rem;">
+                About this Template</h2>
+            <div class="prose prose-invert prose-lg" style="color: #cbd5e1; line-height: 1.8; font-size: 1.125rem;">
+                {{ page.description|richtext }}
+                <p>Equipped with high-quality assets, responsive layouts, and easy-to-customize components. This
+                    template is optimized for speed and conversion, making it the perfect choice for your next {{
+                    page.industry.name|lower }} project.</p>
+                <ul style="margin-top: 2rem; margin-bottom: 2rem; padding-left: 1.5rem;">
+                    <li style="margin-bottom: 0.5rem;">✅ Fully Responsive Design</li>
+                    <li style="margin-bottom: 0.5rem;">✅ SEO Optimized Code</li>
+                    <li style="margin-bottom: 0.5rem;">✅ High-Quality Asset Library</li>
+                    <li style="margin-bottom: 0.5rem;">✅ 24/7 Developer Support</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="right-sidebar">
+            <div class="features-card"
+                style="background: #1e293b; border-radius: 1rem; padding: 2rem; border: 1px solid #334155; position: sticky; top: 120px;">
+                <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem;">Template Specs</h3>
+
+                <div class="spec-row"
+                    style="display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 1rem;">
+                    <span style="color: #94a3b8;">Industry</span>
+                    <span style="font-weight: 600;">{{ page.industry.name }}</span>
+                </div>
+                <div class="spec-row"
+                    style="display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 1rem;">
+                    <span style="color: #94a3b8;">Released</span>
+                    <span style="font-weight: 600;">Jan 2026</span>
+                </div>
+                <div class="spec-row"
+                    style="display: flex; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid #334155; padding-bottom: 1rem;">
+                    <span style="color: #94a3b8;">License</span>
+                    <span style="font-weight: 600;">Commercial</span>
+                </div>
+                <div class="spec-row" style="display: flex; justify-content: space-between; margin-bottom: 0;">
+                    <span style="color: #94a3b8;">Version</span>
+                    <span style="font-weight: 600;">1.2.0</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Related Section Placeholder -->
+    <div class="related-section" style="background: #020617; padding: 4rem 2rem; border-top: 1px solid #1e293b;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 2rem;">You might also like...</h3>
+            <div style="display: flex; gap: 2rem; opacity: 0.5;">
+                <div style="flex: 1; height: 200px; background: #1e293b; border-radius: 1rem;"></div>
+                <div style="flex: 1; height: 200px; background: #1e293b; border-radius: 1rem;"></div>
+                <div style="flex: 1; height: 200px; background: #1e293b; border-radius: 1rem;"></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
