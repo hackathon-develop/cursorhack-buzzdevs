@@ -12,6 +12,11 @@ export default defineConfig(async () => {
           target: 'http://localhost:3001',
           changeOrigin: true,
           secure: false
+        },
+        '/airport-maps': {
+          target: 'http://localhost:3001',
+          changeOrigin: true,
+          secure: false
         }
       }
     }
