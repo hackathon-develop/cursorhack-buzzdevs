@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ElevenLabs Agent</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #e8e8e8;
+    }
+
+    .container {
+      text-align: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 1.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>ElevenLabs Agent</h1>
+    <p>Use the widget in the corner to start a conversation.</p>
+  </div>
+
+
+  <elevenlabs-convai 
+    agent-id="agent_0001kgap6zw7fbst5fcmnrw5j05x"
+    dynamic-variables='{"user_firstname": "Sofia", "user_surname": "Lerm", "account_type": "premium"}'
+  >
+  </elevenlabs-convai>
+  <script src="https://unpkg.com/@elevenlabs/convai-widget-embed" async type="text/javascript"></script>
+
+  <!--
+  <elevenlabs-convai agent-id="YOUR_AGENT_ID"></elevenlabs-convai>
+  <script
+    src="https://unpkg.com/@elevenlabs/convai-widget-embed"
+    async
+    type="text/javascript"
+  ></script>
+-->
+</body>
+
+</html>

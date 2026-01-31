@@ -1,0 +1,8 @@
+{
+  "name": "elevenlabs-agent-widget",
+  "version": "1.0.0",
+  "description": "Simple web app with ElevenLabs agent call widget",
+  "scripts": {
+    "start": "npx --yes serve . -l 3000"
+  }
+}
