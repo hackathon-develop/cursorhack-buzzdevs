@@ -137,35 +137,35 @@
       "to": "F2_A",
       "kind": "corridor",
       "accessible": true,
-      "weight": 220.0
+      "weight": 220
     },
     {
       "from": "F2_A",
       "to": "F2_B",
       "kind": "corridor",
       "accessible": true,
-      "weight": 200.0
+      "weight": 200
     },
     {
       "from": "F2_B",
       "to": "F2_C",
       "kind": "corridor",
       "accessible": true,
-      "weight": 200.0
+      "weight": 200
     },
     {
       "from": "F2_CORE",
       "to": "F2_D",
       "kind": "corridor",
       "accessible": true,
-      "weight": 280.0
+      "weight": 280
     },
     {
       "from": "F2_D",
       "to": "F2_E",
       "kind": "corridor",
       "accessible": true,
-      "weight": 300.0
+      "weight": 300
     },
     {
       "from": "F2_A",
@@ -235,7 +235,7 @@
       "to": "F2_WC3",
       "kind": "corridor",
       "accessible": true,
-      "weight": 260.0
+      "weight": 260
     },
     {
       "from": "F2_SOUTH",

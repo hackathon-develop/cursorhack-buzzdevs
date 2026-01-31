@@ -2,17 +2,21 @@ import React, { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
+type FloorItem = { id: string; image: string; width?: number; height?: number }
+
 type Props = {
   demoMapMode?: boolean
-  selectedFloor?: 'F1' | 'F2'
+  selectedFloor?: string
+  floors?: FloorItem[]
   startId?: number | null
   endId?: number | null
+  onSuggestFloor?: (floorId: string) => void
 }
 
 const IMG_W = 2000
 const IMG_H = 1200
 
-export default function MapView({ demoMapMode = false, selectedFloor = 'F1', startId, endId }: Props) {
+export default function MapView({ demoMapMode = false, selectedFloor = 'F1', floors = [], startId, endId, onSuggestFloor }: Props) {
   const mapRef = useRef<HTMLDivElement | null>(null)
   const floorWrapRef = useRef<HTMLDivElement | null>(null)
   const STORAGE_KEY = 'airport-floor-gate-positions'
@@ -33,6 +37,14 @@ export default function MapView({ demoMapMode = false, selectedFloor = 'F1', sta
     return []
   })
   const [drawingMode, setDrawingMode] = useState(false)
+  const [routePoints, setRoutePoints] = useState<{ x: number; y: number }[]>([])
+  const [routeNodes, setRouteNodes] = useState<{ lat: number; lng: number; floorId: string; nodeId?: string }[]>([])
+  const [graphData, setGraphData] = useState<{
+    nodes: { id: string; x: number; y: number; type: string }[]
+    edges: { from: string; to: string }[]
+    width: number
+    height: number
+  } | null>(null)
 
   useEffect(() => {
     if (Object.keys(customPositions).length > 0) {
@@ -98,7 +110,7 @@ export default function MapView({ demoMapMode = false, selectedFloor = 'F1', sta
       })
 
       pts.forEach((p) => {
-        const m = L.marker([p.lat, p.lng]).addTo(map).bindPopup(p.name)
+        const m = L.marker([p.lat, p.lng]).addTo(map).bindPopup(p.name ?? `Gate ${p.id}`)
         m.bindTooltip(p.name ?? `Gate ${p.id}`, {
           permanent: true,
           direction: 'top',
@@ -138,13 +150,13 @@ export default function MapView({ demoMapMode = false, selectedFloor = 'F1', sta
       }
     }
 
-    window.addEventListener('route-request', routeListener as EventListener)
-    window.addEventListener('point-click', pointClickListener as EventListener)
+    window.addEventListener('route-request', routeListener as unknown as EventListener)
+    window.addEventListener('point-click', pointClickListener as unknown as EventListener)
 
     return () => {
       if (resizeTimer != null) clearTimeout(resizeTimer)
-      window.removeEventListener('route-request', routeListener as EventListener)
-      window.removeEventListener('point-click', pointClickListener as EventListener)
+      window.removeEventListener('route-request', routeListener as unknown as EventListener)
+      window.removeEventListener('point-click', pointClickListener as unknown as EventListener)
       map.remove()
     }
   }, [demoMapMode, selectedFloor])
@@ -155,6 +167,87 @@ export default function MapView({ demoMapMode = false, selectedFloor = 'F1', sta
       window.dispatchEvent(new CustomEvent('route-request', { detail: { from: startId, to: endId } }))
     }
   }, [startId, endId])
+
+  // Graph der aktuellen Floor laden – direkt aus statischer Datei (wie im Admin)
+  useEffect(() => {
+    if (!demoMapMode || !selectedFloor) {
+      setGraphData(null)
+      return
+    }
+    const staticUrl = `/airport-maps/demo_airport/graphs/${selectedFloor}.json`
+    const apiUrl = `/api/airport-map/graph/${selectedFloor}`
+    const load = (url: string) =>
+      fetch(url)
+        .then((r) => {
+          if (!r.ok) throw new Error(String(r.status))
+          return r.json()
+        })
+        .then((data: { nodes?: { id: string; x: number; y: number; type: string }[]; edges?: { from: string; to: string }[]; image?: { width: number; height: number } }) => {
+          const nodes = data.nodes || []
+          const edges = data.edges || []
+          const w = data.image?.width ?? IMG_W
+          const h = data.image?.height ?? IMG_H
+          setGraphData({ nodes, edges, width: w, height: h })
+        })
+    load(staticUrl).catch(() => load(apiUrl).catch(() => setGraphData(null)))
+  }, [demoMapMode, selectedFloor])
+
+  // Route laden wenn Standort + Ziel gewählt; Karte auf Floor der Route stellen
+  useEffect(() => {
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/663dad05-71f3-4268-9f23-559598a3a1db', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'MapView.tsx:route-effect', message: 'route effect run', data: { startId, endId, startIdType: typeof startId, endIdType: typeof endId }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H2' }) }).catch(() => {})
+    // #endregion
+    if (!demoMapMode || startId == null || endId == null || startId === 0 || endId === 0) {
+      setRouteNodes([])
+      return
+    }
+    let cancelled = false
+    fetch(`/api/airport-map/route?from=${startId}&to=${endId}`)
+      .then((r) => {
+        if (!r.ok) throw new Error(`Route ${r.status}`)
+        return r.json()
+      })
+      .then((data: { nodes?: { lat: number; lng: number; floorId: string; nodeId?: string }[] }) => {
+        if (cancelled) return
+        const nodes = Array.isArray(data?.nodes) ? data.nodes : []
+        const firstFloorId = nodes[0]?.floorId
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/663dad05-71f3-4268-9f23-559598a3a1db', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'MapView.tsx:route-then', message: 'route response in MapView', data: { nodesLength: nodes.length, firstFloorId }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H1' }) }).catch(() => {})
+        // #endregion
+        setRouteNodes(nodes)
+        if (nodes.length > 0 && onSuggestFloor) {
+          onSuggestFloor(nodes[0].floorId)
+        }
+      })
+      .catch(() => {
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/663dad05-71f3-4268-9f23-559598a3a1db', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'MapView.tsx:route-catch', message: 'route fetch failed in MapView', data: {}, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H1' }) }).catch(() => {})
+        // #endregion
+        if (!cancelled) setRouteNodes([])
+      })
+    return () => { cancelled = true }
+  }, [demoMapMode, startId, endId, onSuggestFloor])
+
+  // Route-Punkte für aktuell gewählte Floor aus gespeicherter Route ableiten
+  useEffect(() => {
+    if (routeNodes.length === 0) {
+      setRoutePoints([])
+      return
+    }
+    const nodesOnFloor = routeNodes.filter((n) => n.floorId === selectedFloor)
+    const display: { x: number; y: number }[] = nodesOnFloor.map((n) => {
+      const lng = n.lng
+      const lat = n.lat
+      const displayLng = lng
+      const displayLat =
+        selectedFloor === 'F1' ? (lat - 0.5) * 2 : selectedFloor === 'F2' ? lat * 2 : lat
+      return { x: displayLng, y: 1 - displayLat }
+    })
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/663dad05-71f3-4268-9f23-559598a3a1db', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'MapView.tsx:routePoints-effect', message: 'routePoints derived', data: { routeNodesLength: routeNodes.length, selectedFloor, nodesOnFloorLength: nodesOnFloor.length, displayLength: display.length }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H3' }) }).catch(() => {})
+    // #endregion
+    setRoutePoints(display)
+  }, [routeNodes, selectedFloor])
 
   // react to external set-start / set-end
   useEffect(() => {
@@ -167,126 +260,75 @@ export default function MapView({ demoMapMode = false, selectedFloor = 'F1', sta
   }, [])
 
   if (demoMapMode) {
-    const floorSrc = selectedFloor === 'F1' ? '/demo_airport/floors/F1.png' : '/demo_airport/floors/F2.png'
-    const F2_GATES = [
-      { id: 'G01', x: 435, y: 320 },
-      { id: 'G02', x: 645, y: 320 },
-      { id: 'G03', x: 855, y: 320 },
-      { id: 'G04', x: 1145, y: 320 },
-      { id: 'G05', x: 1355, y: 320 },
-      { id: 'G06', x: 1565, y: 320 },
-    ] as const
+    const floorSrc =
+      floors.find((f) => f.id === selectedFloor)?.image ??
+      `/airport-maps/demo_airport/floors/${selectedFloor}.png`
 
-    const getGatePos = (gate: { id: string; x: number; y: number }) => {
-      const custom = customPositions[gate.id]
-      if (custom) return { left: `${custom.x * 100}%`, top: `${custom.y * 100}%` }
-      return {
-        left: `${(gate.x / IMG_W) * 100}%`,
-        top: `${(gate.y / IMG_H) * 100}%`,
-      }
-    }
-
-    const handleFloorClick = (e: React.MouseEvent<HTMLDivElement>) => {
-      if ((e.target as HTMLElement).closest('.floor-pin-positioning-bar, .floor-pin, .path-drawing-bar')) return
-      if (!floorWrapRef.current) return
-      const wrap = floorWrapRef.current
-      const rect = wrap.getBoundingClientRect()
-      const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width))
-      const y = Math.max(0, Math.min(1, (e.clientY - rect.top) / rect.height))
-      if (positioningGate && selectedFloor === 'F2') {
-        setCustomPositions((prev) => ({ ...prev, [positioningGate]: { x, y } }))
-        setPositioningGate(null)
-        return
-      }
-      if (drawingMode) {
-        setPathPoints((prev) => [...prev, { x, y }])
-      }
-    }
-
-    const pathPointsForSvg = pathPoints.length < 2 ? [] : pathPoints
-    const pathD = pathPointsForSvg.length
-      ? `M ${pathPointsForSvg.map((p) => `${p.x},${p.y}`).join(' L ')}`
-      : ''
+    const hasGraph = graphData && (graphData.nodes.length > 0 || graphData.edges.length > 0)
+    const nodeById = graphData ? Object.fromEntries(graphData.nodes.map((n) => [n.id, n])) : {}
+    const gw = graphData?.width ?? IMG_W
+    const gh = graphData?.height ?? IMG_H
+    const viewBox = `0 0 ${gw} ${gh}`
+    const routeStartNodeId = routeNodes.length > 0 ? routeNodes[0].nodeId : null
+    const routeEndNodeId = routeNodes.length > 1 ? routeNodes[routeNodes.length - 1].nodeId : null
 
     return (
       <div
         ref={floorWrapRef}
-        className={`leaflet-container leaflet-container-demo floor-image-wrap ${positioningGate || drawingMode ? 'floor-positioning-mode' : ''}`}
-        onClick={handleFloorClick}
-        role={positioningGate || drawingMode ? 'button' : undefined}
-        aria-label={positioningGate ? `Klicken Sie auf die Karte, um Gate ${positioningGate} zu positionieren` : drawingMode ? 'Klicken Sie, um einen Punkt zum Weg hinzuzufügen' : undefined}
+        className="leaflet-container leaflet-container-demo floor-image-wrap nav-map-wrap"
       >
         <img
           src={floorSrc}
           alt={selectedFloor === 'F1' ? 'Floor 1' : 'Floor 2'}
           className="floor-image"
         />
-        {pathPoints.length > 0 && (
-          <svg
-            className="path-overlay-svg"
-            viewBox="0 0 1 1"
-            preserveAspectRatio="none"
-            aria-hidden
-          >
-            <path d={pathD} className="path-overlay-line" fill="none" />
-            {pathPoints.map((p, i) => (
-              <circle key={i} cx={p.x} cy={p.y} r={0.012} className="path-overlay-dot" />
-            ))}
-          </svg>
-        )}
-        <div className="floor-bottom-bars">
-          <div className="path-drawing-bar">
-            <button
-              type="button"
-              className={`path-draw-btn ${drawingMode ? 'active' : ''}`}
-              onClick={(e) => { e.stopPropagation(); setDrawingMode((on) => !on); if (positioningGate) setPositioningGate(null); }}
-            >
-              {drawingMode ? 'Zeichnen beenden' : 'Weg zeichnen'}
-            </button>
-            <button
-              type="button"
-              className="path-clear-btn"
-              onClick={(e) => { e.stopPropagation(); setPathPoints([]); }}
-            >
-              Weg löschen
-            </button>
-            {drawingMode && (
-              <span className="path-draw-hint">Klicken Sie auf die Karte, um Punkte zu setzen.</span>
-            )}
-          </div>
-          {selectedFloor === 'F2' && (
-            <div className="floor-pin-positioning-bar">
-              <span className="floor-position-label">Gate-Position setzen:</span>
-              {F2_GATES.map((gate) => (
-                <button
-                  key={gate.id}
-                  type="button"
-                  className={`floor-position-btn ${positioningGate === gate.id ? 'active' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); setPositioningGate((g) => (g === gate.id ? null : gate.id)) }}
-                >
-                  {gate.id}
-                </button>
-              ))}
-              {positioningGate && (
-                <span className="floor-position-hint">Klicken Sie auf die Karte, um Gate {positioningGate} zu platzieren.</span>
-              )}
-            </div>
+        <svg
+          className="path-overlay-svg nav-graph-overlay"
+          viewBox={viewBox}
+          preserveAspectRatio="xMidYMid meet"
+          aria-hidden
+        >
+          {hasGraph && (
+            <>
+              {graphData!.edges.map((ed) => {
+                const a = nodeById[ed.from]
+                const b = nodeById[ed.to]
+                if (!a || !b) return null
+                return (
+                  <line
+                    key={`${ed.from}-${ed.to}`}
+                    x1={a.x}
+                    y1={a.y}
+                    x2={b.x}
+                    y2={b.y}
+                    className="nav-graph-edge"
+                  />
+                )
+              })}
+              {graphData!.nodes.map((n) => {
+                const isRouteStart = n.id === routeStartNodeId && routeNodes[0]?.floorId === selectedFloor
+                const isRouteEnd = n.id === routeEndNodeId && routeNodes[routeNodes.length - 1]?.floorId === selectedFloor
+                const extraClass = isRouteStart ? ' nav-graph-node-route-start' : isRouteEnd ? ' nav-graph-node-route-end' : ''
+                return (
+                  <circle
+                    key={n.id}
+                    cx={n.x}
+                    cy={n.y}
+                    r={18}
+                    className={`nav-graph-node nav-graph-node-${n.type}${extraClass}`}
+                  />
+                )
+              })}
+            </>
           )}
-        </div>
-        {selectedFloor === 'F2' && (
-            <div className={`floor-pins-overlay ${positioningGate ? 'floor-pins-overlay-pass-through' : ''}`} aria-hidden>
-              {F2_GATES.map((gate) => (
-                <div
-                  key={gate.id}
-                  className="floor-pin floor-pin-label-only"
-                  style={getGatePos(gate)}
-                  title={`Gate ${gate.id}`}
-                >
-                  <span className="floor-pin-label">Gate {gate.id}</span>
-                </div>
-              ))}
-            </div>
-        )}
+          {routePoints.length >= 2 && (
+            <path
+              d={`M ${routePoints.map((p) => `${p.x * gw},${p.y * gh}`).join(' L ')}`}
+              className="route-overlay-line"
+              fill="none"
+            />
+          )}
+        </svg>
       </div>
     )
   }

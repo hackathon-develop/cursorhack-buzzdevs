@@ -6,6 +6,15 @@ const cors = require('cors')
 
 const DB_PATH = path.join(__dirname, 'data', 'airport.db')
 const AIRPORT_MAPS_PATH = path.join(__dirname, '..', 'airport_maps')
+const DEBUG_LOG_PATH = path.join(__dirname, '..', '..', '.cursor', 'debug.log')
+function debugLog(payload) {
+  try {
+    const dir = path.dirname(DEBUG_LOG_PATH)
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+    const line = JSON.stringify({ ...payload, timestamp: Date.now(), sessionId: 'debug-session' }) + '\n'
+    fs.appendFileSync(DEBUG_LOG_PATH, line)
+  } catch (_) {}
+}
 
 if (!fs.existsSync(DB_PATH)) {
   console.log('No DB found. Run `npm run seed` to create sample data.')
@@ -55,6 +64,25 @@ function getDemoAirport() {
   return demoAirportCache
 }
 
+function nodeTypeToDisplayName(type, nodeId) {
+  const suffix = (nodeId || '').replace(/^F\d_/, '')
+  const map = {
+    entrance: 'Entrance',
+    security: 'Security',
+    checkin: 'Check-in',
+    gate: suffix ? `Gate ${suffix}` : 'Gate',
+    toilet: 'WC',
+    bakery: 'Bakery',
+    restaurant: 'Restaurant',
+    elevator: 'Elevator',
+    stairs: 'Stairs',
+    vertical_core: 'Elevator / Stairs',
+    corridor: suffix ? `Corridor ${suffix}` : 'Corridor',
+    corridor_end: 'Corridor (End)',
+  }
+  return map[type] || suffix || nodeId
+}
+
 function buildDemoAirportPoints(data) {
   const { nodeById, pois } = data
   const points = []
@@ -78,7 +106,7 @@ function buildDemoAirportPoints(data) {
   Object.keys(nodeById).forEach((nodeId) => {
     if (idByNodeId[nodeId] != null) return
     const n = nodeById[nodeId]
-    const name = n.type === 'gate' ? nodeId.replace(/^F\d_/, '') : nodeId
+    const name = nodeTypeToDisplayName(n.type, nodeId)
     add(nodeId, name, n.floorId, n.type)
   })
   const nodeIdById = {}
@@ -92,6 +120,96 @@ app.use(express.json())
 
 app.use('/airport-maps', express.static(AIRPORT_MAPS_PATH))
 
+// --- Admin API (airport_maps read/write) ---
+const indexPath = path.join(AIRPORT_MAPS_PATH, 'index.json')
+function getAirportsList() {
+  if (!fs.existsSync(indexPath)) return []
+  try {
+    const data = JSON.parse(fs.readFileSync(indexPath, 'utf8'))
+    return (data.airports || []).map((a) => ({ id: a.id, name: a.name || a.id, path: a.path }))
+  } catch (_) {
+    return []
+  }
+}
+
+function getManifestForAirport(airportId) {
+  const list = getAirportsList()
+  const airport = list.find((a) => a.id === airportId)
+  if (!airport) return null
+  const manifestPath = path.join(AIRPORT_MAPS_PATH, airportId, 'manifest.json')
+  if (!fs.existsSync(manifestPath)) return null
+  try {
+    return JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
+  } catch (_) {
+    return null
+  }
+}
+
+app.get('/api/admin/airports', (req, res) => {
+  const airports = getAirportsList()
+  res.json({ airports })
+})
+
+app.get('/api/admin/airports/:airportId', (req, res) => {
+  const { airportId } = req.params
+  const manifest = getManifestForAirport(airportId)
+  if (!manifest) return res.status(404).json({ error: 'Airport not found' })
+  const base = `/airport-maps/${airportId}`
+  const floors = (manifest.floors || []).map((f) => ({
+    id: f.id,
+    image: `${base}/floors/${f.id}.png`,
+    imagePath: f.image,
+    graph: f.graph,
+    width: f.width || 2000,
+    height: f.height || 1200,
+  }))
+  res.json({ airport_id: manifest.airport_id, display_name: manifest.display_name, default_floor: manifest.default_floor, floors })
+})
+
+app.get('/api/admin/airports/:airportId/floors/:floorId/graph', (req, res) => {
+  const { airportId, floorId } = req.params
+  const manifest = getManifestForAirport(airportId)
+  if (!manifest) return res.status(404).json({ error: 'Airport not found' })
+  const floor = (manifest.floors || []).find((f) => f.id === floorId)
+  if (!floor) return res.status(404).json({ error: 'Floor not found' })
+  const graphPath = path.join(AIRPORT_MAPS_PATH, airportId, 'graphs', `${floorId}.json`)
+  if (!fs.existsSync(graphPath)) {
+    return res.json({ image: { width: floor.width || 2000, height: floor.height || 1200 }, nodes: [], edges: [] })
+  }
+  try {
+    const graph = JSON.parse(fs.readFileSync(graphPath, 'utf8'))
+    res.json(graph)
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
+})
+
+app.put('/api/admin/airports/:airportId/floors/:floorId/graph', (req, res) => {
+  const { airportId, floorId } = req.params
+  const manifest = getManifestForAirport(airportId)
+  if (!manifest) return res.status(404).json({ error: 'Airport not found' })
+  const floor = (manifest.floors || []).find((f) => f.id === floorId)
+  if (!floor) return res.status(404).json({ error: 'Floor not found' })
+  const { nodes = [], edges = [] } = req.body
+  const graphDir = path.join(AIRPORT_MAPS_PATH, airportId, 'graphs')
+  fs.mkdirSync(graphDir, { recursive: true })
+  const graphPath = path.join(graphDir, `${floorId}.json`)
+  const width = floor.width || 2000
+  const height = floor.height || 1200
+  const payload = {
+    image: { width, height },
+    nodes: Array.isArray(nodes) ? nodes : [],
+    edges: Array.isArray(edges) ? edges : [],
+  }
+  try {
+    fs.writeFileSync(graphPath, JSON.stringify(payload, null, 2), 'utf8')
+    res.json({ ok: true })
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
+})
+
+// --- Public airport-map API ---
 app.get('/api/airport-map/manifest', (req, res) => {
   const data = getDemoAirport()
   if (!data) return res.status(404).json({ error: 'Demo airport not found' })
@@ -112,6 +230,24 @@ app.get('/api/airport-map/manifest', (req, res) => {
   })
   manifest.pois = undefined
   res.json(manifest)
+})
+
+app.get('/api/airport-map/graph/:floorId', (req, res) => {
+  const data = getDemoAirport()
+  if (!data) return res.status(404).json({ error: 'Demo airport not found' })
+  const floorId = req.params.floorId
+  const floor = (data.manifest.floors || []).find((f) => f.id === floorId)
+  if (!floor) return res.status(404).json({ error: 'Floor not found' })
+  const graphPath = path.join(AIRPORT_MAPS_PATH, data.manifest.airport_id, 'graphs', `${floorId}.json`)
+  if (!fs.existsSync(graphPath)) {
+    return res.json({ image: { width: floor.width || 2000, height: floor.height || 1200 }, nodes: [], edges: [] })
+  }
+  try {
+    const graph = JSON.parse(fs.readFileSync(graphPath, 'utf8'))
+    res.json(graph)
+  } catch (e) {
+    res.status(500).json({ error: e.message })
+  }
 })
 
 app.get('/api/airport-map/points', (req, res) => {
@@ -142,17 +278,26 @@ app.get('/api/airport-map/restaurants', (req, res) => {
 app.get('/api/airport-map/route', async (req, res) => {
   const fromId = Number(req.query.from)
   const toId = Number(req.query.to)
+  // #region agent log
+  debugLog({ location: 'backend/index.js:route-handler', message: 'route request', data: { fromId, toId, fromQuery: req.query.from, toQuery: req.query.to }, hypothesisId: 'H1' })
+  fetch('http://127.0.0.1:7242/ingest/663dad05-71f3-4268-9f23-559598a3a1db', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'backend/index.js:route-handler', message: 'route request', data: { fromId, toId, fromQuery: req.query.from, toQuery: req.query.to }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H1' }) }).catch(() => {})
+  // #endregion
   if (!fromId || !toId) return res.status(400).json({ error: 'Missing from/to' })
   const data = getDemoAirport()
   if (!data) return res.status(404).json({ error: 'Demo airport not found' })
   const { points, nodeIdById } = buildDemoAirportPoints(data)
   const fromNodeId = nodeIdById[fromId]
   const toNodeId = nodeIdById[toId]
+  // #region agent log
+  debugLog({ location: 'backend/index.js:nodeIds', message: 'nodeId lookup', data: { fromId, toId, fromNodeId: fromNodeId || null, toNodeId: toNodeId || null }, hypothesisId: 'H1' })
+  fetch('http://127.0.0.1:7242/ingest/663dad05-71f3-4268-9f23-559598a3a1db', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'backend/index.js:nodeIds', message: 'nodeId lookup', data: { fromId, toId, fromNodeId: fromNodeId || null, toNodeId: toNodeId || null }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H1' }) }).catch(() => {})
+  // #endregion
   if (!fromNodeId || !toNodeId) return res.status(400).json({ error: 'Invalid from/to' })
   const adj = {}
   const addEdge = (a, b, w) => {
     if (!adj[a]) adj[a] = []
     adj[a].push({ to: b, w })
+    if (!adj[b]) adj[b] = [] // ensure target is in adj so it gets dist/prev and is in Q
   }
   Object.values(data.graphs).forEach((g) => {
     (g.edges || []).forEach((e) => {
@@ -163,6 +308,10 @@ app.get('/api/airport-map/route', async (req, res) => {
   ;(data.manifest.inter_floor_links || []).forEach((link) => {
     addEdge(link.from, link.to, 50)
     addEdge(link.to, link.from, 50)
+  })
+  // Ensure every node (especially from/to) is in adj so it gets dist/prev and is in Q
+  Object.keys(data.nodeById).forEach((nodeId) => {
+    if (!adj[nodeId]) adj[nodeId] = []
   })
   const dist = {}
   const prev = {}
@@ -183,6 +332,9 @@ app.get('/api/airport-map/route', async (req, res) => {
   const pathNodeIds = []
   let u = toNodeId
   while (u) { pathNodeIds.unshift(u); u = prev[u] }
+  // #region agent log
+  debugLog({ location: 'backend/index.js:path-check', message: 'path result', data: { fromNodeId, toNodeId, pathNodeIdsLength: pathNodeIds.length, pathNodeIds0: pathNodeIds[0], distToNode: dist[toNodeId], adjFromKeys: Object.keys(adj).filter((k) => k === fromNodeId || k === toNodeId) }, hypothesisId: 'H1' })
+  // #endregion
   if (pathNodeIds[0] !== fromNodeId) {
     return res.json({ nodes: [], distance: null, path_length_m: null, walking_minutes: null })
   }
@@ -208,6 +360,10 @@ app.get('/api/airport-map/route', async (req, res) => {
     }
   }
   const walkingMinutes = pathLengthM / (80 / 60)
+  // #region agent log
+  debugLog({ location: 'backend/index.js:route-response', message: 'route response', data: { pathNodesLength: pathNodes.length, firstFloorId: pathNodes[0]?.floorId }, hypothesisId: 'H1' })
+  fetch('http://127.0.0.1:7242/ingest/663dad05-71f3-4268-9f23-559598a3a1db', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'backend/index.js:route-response', message: 'route response', data: { pathNodesLength: pathNodes.length, firstFloorId: pathNodes[0]?.floorId }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H1' }) }).catch(() => {})
+  // #endregion
   res.json({
     nodes: pathNodes,
     distance: dist[toNodeId] === Infinity ? null : dist[toNodeId],
@@ -391,5 +547,5 @@ app.get('/api/route', async (req, res) => {
 // static frontend for convenience
 app.use('/', express.static(path.join(__dirname, '..', 'frontend', 'dist')))
 
-const port = process.env.PORT || 3001
+const port = process.env.PORT || 3002
 app.listen(port, () => console.log('API listening on', port))

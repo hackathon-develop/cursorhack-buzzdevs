@@ -81,6 +81,7 @@ export default function SearchBar({ demoMapMode = false, onSelectStart, onSelect
   const [selectedFlight, setSelectedFlight] = useState<FlightOption | null>(null)
   const [endIdFromMap, setEndIdFromMap] = useState<number | null>(null)
   const [showStandortDropdown, setShowStandortDropdown] = useState(false)
+  const [showZielDropdown, setShowZielDropdown] = useState(false)
   const [routeWalkingMinutes, setRouteWalkingMinutes] = useState<number | null>(null)
   const [now, setNow] = useState(() => new Date())
   const [apiFlights, setApiFlights] = useState<ApiFlight[]>([])
@@ -90,6 +91,7 @@ export default function SearchBar({ demoMapMode = false, onSelectStart, onSelect
   const [restaurants, setRestaurants] = useState<{ id: number; name: string; tags?: string[] }[]>([])
   const countryDropdownRef = useRef<HTMLDivElement>(null)
   const standortDropdownRef = useRef<HTMLDivElement>(null)
+  const zielDropdownRef = useRef<HTMLDivElement>(null)
 
   const endId = selectedFlight?.gateId ?? endIdFromMap
 
@@ -217,6 +219,9 @@ export default function SearchBar({ demoMapMode = false, onSelectStart, onSelect
       if (standortDropdownRef.current && !standortDropdownRef.current.contains(target)) {
         setShowStandortDropdown(false)
       }
+      if (zielDropdownRef.current && !zielDropdownRef.current.contains(target)) {
+        setShowZielDropdown(false)
+      }
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
@@ -229,6 +234,7 @@ export default function SearchBar({ demoMapMode = false, onSelectStart, onSelect
   }
 
   const selectedStandortName = startId ? points.find((p) => p.id === startId)?.name ?? '' : ''
+  const pointsSorted = [...points].sort((a, b) => (a.name || '').localeCompare(b.name || ''))
 
   const handleCountryInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCountryInput(e.target.value)
@@ -317,7 +323,7 @@ export default function SearchBar({ demoMapMode = false, onSelectStart, onSelect
                   - Standort wählen -
                 </button>
               </li>
-              {points.map((p) => (
+              {pointsSorted.map((p) => (
                 <li key={p.id} role="option">
                   <button
                     type="button"
@@ -334,30 +340,50 @@ export default function SearchBar({ demoMapMode = false, onSelectStart, onSelect
       </section>
 
       {demoMapMode ? (
-        <section className="nav-section nav-section-gate">
-          <h3 className="nav-section-title">Ziel (Gate)</h3>
-          <p className="nav-section-desc">Wählen Sie Ihr Ziel-Gate.</p>
-          <ul className="standort-list gate-list">
-            {points
-              .filter((p) => /Gate G\d+|^G\d+$/.test(p.name))
-              .map((p) => (
-                <li key={p.id}>
-                  <button
-                    type="button"
-                    className={`standort-option ${endId === p.id ? 'active' : ''}`}
-                    onClick={() => {
-                      setCountrySelected(null)
-                      setCountryInput('')
-                      setSelectedFlight(null)
-                      setEndIdFromMap(p.id)
-                      onSelectEnd(p.id)
-                    }}
-                  >
-                    {p.name}
-                  </button>
-                </li>
-              ))}
-          </ul>
+        <section className="nav-section" ref={zielDropdownRef}>
+          <h3 className="nav-section-title">Ziel</h3>
+          <p className="nav-section-desc">Wohin möchten Sie? (wie auf der Karte)</p>
+          <div className="standort-dropdown-wrap">
+            <button
+              type="button"
+              className="standort-trigger"
+              onClick={() => setShowZielDropdown((v) => !v)}
+              aria-expanded={showZielDropdown}
+              aria-haspopup="listbox"
+              aria-label="Ziel auswählen"
+            >
+              <span className={!endId ? 'placeholder' : ''}>
+                {endId ? (points.find((p) => p.id === endId)?.name ?? '') : '- Ziel wählen -'}
+              </span>
+              <span className="standort-chevron" aria-hidden>▼</span>
+            </button>
+            {showZielDropdown && (
+              <ul
+                className="standort-list"
+                role="listbox"
+                aria-label="Ziel"
+              >
+                {pointsSorted.map((p) => (
+                  <li key={p.id} role="option">
+                    <button
+                      type="button"
+                      className={`standort-option ${endId === p.id ? 'active' : ''}`}
+                      onClick={() => {
+                        setCountrySelected(null)
+                        setCountryInput('')
+                        setSelectedFlight(null)
+                        setEndIdFromMap(p.id)
+                        onSelectEnd(p.id)
+                        setShowZielDropdown(false)
+                      }}
+                    >
+                      {p.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </section>
       ) : (
         <section className="nav-section nav-section-zielland" ref={countryDropdownRef}>
@@ -500,7 +526,7 @@ export default function SearchBar({ demoMapMode = false, onSelectStart, onSelect
 
       {(selectedFlight || (demoMapMode && endId)) && (
         <section className="nav-section gate-result">
-          <h3 className="nav-section-title">Ihr Gate</h3>
+          <h3 className="nav-section-title">{demoMapMode ? 'Ihr Ziel' : 'Ihr Gate'}</h3>
           <p className="gate-value">{selectedFlight ? selectedFlight.gateName : (points.find((p) => p.id === endId)?.name ?? '')}</p>
         </section>
       )}
@@ -518,7 +544,7 @@ export default function SearchBar({ demoMapMode = false, onSelectStart, onSelect
           )}
           {walkingTimeText != null && (
             <div className="time-row">
-              <span className="time-label">Gehzeit zum Gate:</span>
+              <span className="time-label">{demoMapMode ? 'Gehzeit zum Ziel:' : 'Gehzeit zum Gate:'}</span>
               <span className="time-value">{walkingTimeText}</span>
             </div>
           )}
