@@ -1,0 +1,211 @@
+{
+  "image": {
+    "width": 2000,
+    "height": 1200
+  },
+  "nodes": [
+    {
+      "id": "F1_ENT",
+      "x": 130,
+      "y": 600,
+      "type": "entrance"
+    },
+    {
+      "id": "F1_A",
+      "x": 300,
+      "y": 600,
+      "type": "corridor"
+    },
+    {
+      "id": "F1_B",
+      "x": 520,
+      "y": 600,
+      "type": "corridor"
+    },
+    {
+      "id": "F1_SEC",
+      "x": 780,
+      "y": 600,
+      "type": "security"
+    },
+    {
+      "id": "F1_C",
+      "x": 1000,
+      "y": 600,
+      "type": "corridor"
+    },
+    {
+      "id": "F1_CORE",
+      "x": 1120,
+      "y": 600,
+      "type": "vertical_core"
+    },
+    {
+      "id": "F1_D",
+      "x": 1400,
+      "y": 600,
+      "type": "corridor"
+    },
+    {
+      "id": "F1_E",
+      "x": 1700,
+      "y": 600,
+      "type": "corridor_end"
+    },
+    {
+      "id": "F1_NORTH",
+      "x": 1000,
+      "y": 520,
+      "type": "corridor"
+    },
+    {
+      "id": "F1_SOUTH",
+      "x": 1000,
+      "y": 680,
+      "type": "corridor"
+    },
+    {
+      "id": "F1_CHKIN",
+      "x": 480,
+      "y": 780,
+      "type": "checkin"
+    },
+    {
+      "id": "F1_WC1",
+      "x": 830,
+      "y": 940,
+      "type": "toilet"
+    },
+    {
+      "id": "F1_BAK1",
+      "x": 1080,
+      "y": 940,
+      "type": "bakery"
+    },
+    {
+      "id": "F1_RES1",
+      "x": 1410,
+      "y": 940,
+      "type": "restaurant"
+    },
+    {
+      "id": "F1_ELEV",
+      "x": 1170,
+      "y": 540,
+      "type": "elevator"
+    },
+    {
+      "id": "F1_STAIRS",
+      "x": 1180,
+      "y": 720,
+      "type": "stairs"
+    }
+  ],
+  "edges": [
+    {
+      "from": "F1_ENT",
+      "to": "F1_A",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 170.0
+    },
+    {
+      "from": "F1_A",
+      "to": "F1_B",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 220.0
+    },
+    {
+      "from": "F1_B",
+      "to": "F1_SEC",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 260.0
+    },
+    {
+      "from": "F1_SEC",
+      "to": "F1_C",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 220.0
+    },
+    {
+      "from": "F1_C",
+      "to": "F1_CORE",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 120.0
+    },
+    {
+      "from": "F1_CORE",
+      "to": "F1_D",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 280.0
+    },
+    {
+      "from": "F1_D",
+      "to": "F1_E",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 300.0
+    },
+    {
+      "from": "F1_C",
+      "to": "F1_NORTH",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 80.0
+    },
+    {
+      "from": "F1_C",
+      "to": "F1_SOUTH",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 80.0
+    },
+    {
+      "from": "F1_B",
+      "to": "F1_CHKIN",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 184.39
+    },
+    {
+      "from": "F1_SOUTH",
+      "to": "F1_WC1",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 310.64
+    },
+    {
+      "from": "F1_SOUTH",
+      "to": "F1_BAK1",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 272.03
+    },
+    {
+      "from": "F1_D",
+      "to": "F1_RES1",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 340.15
+    },
+    {
+      "from": "F1_CORE",
+      "to": "F1_ELEV",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 78.1
+    },
+    {
+      "from": "F1_CORE",
+      "to": "F1_STAIRS",
+      "kind": "corridor",
+      "accessible": true,
+      "weight": 134.16
+    }
+  ]
+}

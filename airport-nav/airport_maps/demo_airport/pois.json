@@ -1,0 +1,460 @@
+{
+  "pois": [
+    {
+      "id": "ENT",
+      "label": "Entrance",
+      "category": "entrance",
+      "floor_id": "F1",
+      "node": "F1_ENT"
+    },
+    {
+      "id": "SEC",
+      "label": "Security",
+      "category": "security",
+      "floor_id": "F1",
+      "node": "F1_SEC"
+    },
+    {
+      "id": "CHKIN",
+      "label": "Check-in",
+      "category": "checkin",
+      "floor_id": "F1",
+      "node": "F1_CHKIN"
+    },
+    {
+      "id": "G01",
+      "label": "Gate G01",
+      "category": "gate",
+      "floor_id": "F2",
+      "node": "F2_G01"
+    },
+    {
+      "id": "G02",
+      "label": "Gate G02",
+      "category": "gate",
+      "floor_id": "F2",
+      "node": "F2_G02"
+    },
+    {
+      "id": "G03",
+      "label": "Gate G03",
+      "category": "gate",
+      "floor_id": "F2",
+      "node": "F2_G03"
+    },
+    {
+      "id": "G04",
+      "label": "Gate G04",
+      "category": "gate",
+      "floor_id": "F2",
+      "node": "F2_G04"
+    },
+    {
+      "id": "G05",
+      "label": "Gate G05",
+      "category": "gate",
+      "floor_id": "F2",
+      "node": "F2_G05"
+    },
+    {
+      "id": "G06",
+      "label": "Gate G06",
+      "category": "gate",
+      "floor_id": "F2",
+      "node": "F2_G06"
+    },
+    {
+      "id": "WC_1",
+      "label": "WC (Landside)",
+      "category": "toilet",
+      "floor_id": "F1",
+      "node": "F1_WC1",
+      "features": {
+        "accessible": true,
+        "baby_changing": true,
+        "gender_neutral": false
+      }
+    },
+    {
+      "id": "WC_2",
+      "label": "WC (Airside East)",
+      "category": "toilet",
+      "floor_id": "F2",
+      "node": "F2_WC2",
+      "features": {
+        "accessible": true,
+        "baby_changing": false,
+        "gender_neutral": true
+      }
+    },
+    {
+      "id": "WC_3",
+      "label": "WC (Airside Central)",
+      "category": "toilet",
+      "floor_id": "F2",
+      "node": "F2_WC3",
+      "features": {
+        "accessible": true,
+        "baby_changing": true,
+        "gender_neutral": true
+      }
+    },
+    {
+      "id": "BAKERY_1",
+      "label": "Sunrise Bakery",
+      "category": "bakery",
+      "floor_id": "F1",
+      "node": "F1_BAK1",
+      "features": {
+        "brand": "Sunrise Bakery",
+        "cuisine": [
+          "bakery",
+          "coffee"
+        ],
+        "price_level": 2,
+        "dietary": [
+          "vegetarian_options"
+        ],
+        "service": [
+          "grab_and_go",
+          "takeaway"
+        ],
+        "order_options": [
+          "counter",
+          "kiosk"
+        ],
+        "payment": [
+          "card",
+          "apple_pay",
+          "google_pay",
+          "cashless_only"
+        ],
+        "seating": {
+          "indoor": true,
+          "seats": 18
+        },
+        "avg_wait_min": 5,
+        "rating": 4.0,
+        "rating_count": 120,
+        "hours": {
+          "mon": [
+            [
+              "05:00",
+              "19:00"
+            ]
+          ],
+          "tue": [
+            [
+              "05:00",
+              "19:00"
+            ]
+          ],
+          "wed": [
+            [
+              "05:00",
+              "19:00"
+            ]
+          ],
+          "thu": [
+            [
+              "05:00",
+              "19:00"
+            ]
+          ],
+          "fri": [
+            [
+              "05:00",
+              "20:00"
+            ]
+          ],
+          "sat": [
+            [
+              "06:00",
+              "20:00"
+            ]
+          ],
+          "sun": [
+            [
+              "06:00",
+              "19:00"
+            ]
+          ]
+        },
+        "tags": [
+          "coffee",
+          "breakfast",
+          "fast"
+        ]
+      }
+    },
+    {
+      "id": "BAKERY_2",
+      "label": "Cloud Nine Bakery",
+      "category": "bakery",
+      "floor_id": "F2",
+      "node": "F2_BAK2",
+      "features": {
+        "brand": "Cloud Nine Bakery",
+        "cuisine": [
+          "bakery",
+          "pastry",
+          "coffee"
+        ],
+        "price_level": 1,
+        "dietary": [
+          "vegan_options",
+          "gluten_free_options"
+        ],
+        "service": [
+          "grab_and_go",
+          "takeaway"
+        ],
+        "order_options": [
+          "counter",
+          "mobile_order"
+        ],
+        "payment": [
+          "card",
+          "apple_pay",
+          "google_pay"
+        ],
+        "seating": {
+          "indoor": false,
+          "seats": 0
+        },
+        "avg_wait_min": 4,
+        "rating": 4.6,
+        "rating_count": 80,
+        "hours": {
+          "mon": [
+            [
+              "06:00",
+              "18:00"
+            ]
+          ],
+          "tue": [
+            [
+              "06:00",
+              "18:00"
+            ]
+          ],
+          "wed": [
+            [
+              "06:00",
+              "18:00"
+            ]
+          ],
+          "thu": [
+            [
+              "06:00",
+              "18:00"
+            ]
+          ],
+          "fri": [
+            [
+              "06:00",
+              "19:00"
+            ]
+          ],
+          "sat": [
+            [
+              "07:00",
+              "19:00"
+            ]
+          ],
+          "sun": [
+            [
+              "07:00",
+              "18:00"
+            ]
+          ]
+        },
+        "tags": [
+          "cheap",
+          "vegan_pastries",
+          "near_lounge"
+        ]
+      }
+    },
+    {
+      "id": "RESTAURANT_1",
+      "label": "Runway Grill",
+      "category": "restaurant",
+      "floor_id": "F1",
+      "node": "F1_RES1",
+      "features": {
+        "brand": "Runway Grill",
+        "cuisine": [
+          "american",
+          "grill"
+        ],
+        "price_level": 3,
+        "dietary": [
+          "vegetarian_options",
+          "gluten_free_options"
+        ],
+        "service": [
+          "dine_in",
+          "takeaway"
+        ],
+        "order_options": [
+          "counter",
+          "kiosk"
+        ],
+        "payment": [
+          "card",
+          "apple_pay",
+          "google_pay",
+          "cashless_only"
+        ],
+        "seating": {
+          "indoor": true,
+          "seats": 60,
+          "high_chairs": true
+        },
+        "avg_wait_min": 12,
+        "rating": 4.2,
+        "rating_count": 340,
+        "hours": {
+          "mon": [
+            [
+              "06:00",
+              "21:00"
+            ]
+          ],
+          "tue": [
+            [
+              "06:00",
+              "21:00"
+            ]
+          ],
+          "wed": [
+            [
+              "06:00",
+              "21:00"
+            ]
+          ],
+          "thu": [
+            [
+              "06:00",
+              "21:00"
+            ]
+          ],
+          "fri": [
+            [
+              "06:00",
+              "22:00"
+            ]
+          ],
+          "sat": [
+            [
+              "07:00",
+              "22:00"
+            ]
+          ],
+          "sun": [
+            [
+              "07:00",
+              "21:00"
+            ]
+          ]
+        },
+        "tags": [
+          "family_friendly",
+          "full_meals",
+          "near_security"
+        ]
+      }
+    },
+    {
+      "id": "RESTAURANT_2",
+      "label": "Atlas Kitchen",
+      "category": "restaurant",
+      "floor_id": "F2",
+      "node": "F2_RES2",
+      "features": {
+        "brand": "Atlas Kitchen",
+        "cuisine": [
+          "mediterranean",
+          "middle_eastern"
+        ],
+        "price_level": 2,
+        "dietary": [
+          "halal",
+          "vegetarian_options",
+          "vegan_options"
+        ],
+        "service": [
+          "dine_in",
+          "takeaway"
+        ],
+        "order_options": [
+          "counter",
+          "mobile_order"
+        ],
+        "payment": [
+          "card",
+          "apple_pay",
+          "google_pay"
+        ],
+        "seating": {
+          "indoor": true,
+          "seats": 42,
+          "high_chairs": false
+        },
+        "avg_wait_min": 8,
+        "rating": 4.5,
+        "rating_count": 190,
+        "hours": {
+          "mon": [
+            [
+              "05:30",
+              "20:30"
+            ]
+          ],
+          "tue": [
+            [
+              "05:30",
+              "20:30"
+            ]
+          ],
+          "wed": [
+            [
+              "05:30",
+              "20:30"
+            ]
+          ],
+          "thu": [
+            [
+              "05:30",
+              "20:30"
+            ]
+          ],
+          "fri": [
+            [
+              "05:30",
+              "21:00"
+            ]
+          ],
+          "sat": [
+            [
+              "06:00",
+              "21:00"
+            ]
+          ],
+          "sun": [
+            [
+              "06:00",
+              "20:30"
+            ]
+          ]
+        },
+        "tags": [
+          "quick_service",
+          "healthy",
+          "near_gates"
+        ]
+      }
+    }
+  ]
+}

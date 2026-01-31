@@ -1,0 +1,10 @@
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+.app { display: flex; flex-direction: column; height: 100%; }
+.header { padding: 12px; background: #0b5cff; color: white; }
+.main { display: flex; flex: 1; }
+.sidebar { width: 320px; padding: 12px; background: #f5f7fb; }
+.map-container { flex: 1; }
+.leaflet-container { width: 100%; height: 100%; }
+.actions { margin-top: 12px; }
+button { padding: 8px 12px; }

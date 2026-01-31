@@ -1,0 +1,45 @@
+{
+  "airport_id": "demo_airport",
+  "display_name": "Demo Airport (Fictional)",
+  "default_floor": "F1",
+  "floors": [
+    {
+      "id": "F1",
+      "image": "./floors/F1.png",
+      "graph": "./graphs/F1.json",
+      "width": 2000,
+      "height": 1200
+    },
+    {
+      "id": "F2",
+      "image": "./floors/F2.png",
+      "graph": "./graphs/F2.json",
+      "width": 2000,
+      "height": 1200
+    }
+  ],
+  "pois": "./pois.json",
+  "inter_floor_links": [
+    {
+      "from": "F1_ELEV",
+      "to": "F2_ELEV",
+      "kind": "elevator",
+      "accessible": true
+    },
+    {
+      "from": "F1_STAIRS",
+      "to": "F2_STAIRS",
+      "kind": "stairs",
+      "accessible": false
+    }
+  ],
+  "counts": {
+    "restaurants": 2,
+    "bakeries": 2,
+    "wcs": 3
+  },
+  "scale": {
+    "meters_per_pixel": 0.1,
+    "walking_speed_mps": 1.3
+  }
+}
