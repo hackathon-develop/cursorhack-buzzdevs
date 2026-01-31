@@ -22,44 +22,94 @@
     <div class="layout" style="display: flex; gap: 4rem; max-width: 1400px; margin: 0 auto; flex-wrap: wrap;">
         <!-- Sidebar -->
         <aside class="sidebar" style="flex: 0 0 250px; min-width: 200px;">
-            <h3
-                style="font-size: 0.875rem; font-weight: 700; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b;">
-                Industry</h3>
-            <ul style="list-style: none; padding: 0; margin: 0;">
-                <li style="margin-bottom: 0.875rem;">
-                    <a href="?"
-                        style="color: {% if not current_category %}white{% else %}#94a3b8{% endif %}; text-decoration: none; display: flex; align-items: center; gap: 0.75rem; transition: all 0.2s; font-size: 0.95rem;">
-                        <div
-                            style="width: 18px; height: 18px; border: 2px solid {% if not current_category %}#60a5fa{% else %}#334155{% endif %}; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: {% if not current_category %}#60a5fa{% else %}transparent{% endif %}; transition: all 0.2s;">
-                            {% if not current_category %}
-                            <svg width="10" height="8" viewBox="0 0 10 8" fill="none" stroke="white" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M1 4L3.5 6.5L9 1" />
-                            </svg>
-                            {% endif %}
-                        </div>
-                        <span style="{% if not current_category %}font-weight: 600;{% endif %}">All Categories</span>
-                    </a>
-                </li>
-                {% for cat in categories %}
-                <li style="margin-bottom: 0.875rem;">
-                    <a href="?category={{ cat.slug }}"
-                        style="color: {% if current_category == cat.slug %}white{% else %}#94a3b8{% endif %}; text-decoration: none; display: flex; align-items: center; gap: 0.75rem; transition: all 0.2s; font-size: 0.95rem; cursor: pointer;">
-                        <div
-                            style="width: 18px; height: 18px; border: 2px solid {% if current_category == cat.slug %}#60a5fa{% else %}#334155{% endif %}; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: {% if current_category == cat.slug %}#60a5fa{% else %}transparent{% endif %}; transition: all 0.2s;">
-                            {% if current_category == cat.slug %}
-                            <svg width="10" height="8" viewBox="0 0 10 8" fill="none" stroke="white" stroke-width="2"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M1 4L3.5 6.5L9 1" />
-                            </svg>
-                            {% endif %}
-                        </div>
-                        <span style="{% if current_category == cat.slug %}font-weight: 600;{% endif %}">{{ cat.name
-                            }}</span>
-                    </a>
-                </li>
-                {% endfor %}
-            </ul>
+            <form id="filter-form" method="get">
+                <!-- Industry -->
+                <div class="mb-8" style="margin-bottom: 2rem;">
+                    <h3
+                        style="font-size: 0.875rem; font-weight: 700; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b;">
+                        Industry</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        {% for cat in industries %}
+                        <li style="margin-bottom: 0.875rem;">
+                            <label class="filter-label {% if cat.slug in selected_slugs %}checked{% endif %}">
+                                <input type="checkbox" name="category" value="{{ cat.slug }}" {% if cat.slug in
+                                    selected_slugs %}checked{% endif %} onchange="this.form.submit()"
+                                    style="display: none;">
+                                <div class="checkbox-indicator">
+                                    {% if cat.slug in selected_slugs %}
+                                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none" stroke="white"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 4L3.5 6.5L9 1" />
+                                    </svg>
+                                    {% endif %}
+                                </div>
+                                <span>{{ cat.name }}</span>
+                            </label>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Season -->
+                <div class="mb-8" style="margin-bottom: 2rem;">
+                    <h3
+                        style="font-size: 0.875rem; font-weight: 700; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b;">
+                        Season</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        {% for cat in seasons %}
+                        <li style="margin-bottom: 0.875rem;">
+                            <label class="filter-label {% if cat.slug in selected_slugs %}checked{% endif %}">
+                                <input type="checkbox" name="category" value="{{ cat.slug }}" {% if cat.slug in
+                                    selected_slugs %}checked{% endif %} onchange="this.form.submit()"
+                                    style="display: none;">
+                                <div class="checkbox-indicator">
+                                    {% if cat.slug in selected_slugs %}
+                                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none" stroke="white"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 4L3.5 6.5L9 1" />
+                                    </svg>
+                                    {% endif %}
+                                </div>
+                                <span>{{ cat.name }}</span>
+                            </label>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Style -->
+                <div class="mb-8" style="margin-bottom: 2rem;">
+                    <h3
+                        style="font-size: 0.875rem; font-weight: 700; margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b;">
+                        Style</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        {% for cat in styles %}
+                        <li style="margin-bottom: 0.875rem;">
+                            <label class="filter-label {% if cat.slug in selected_slugs %}checked{% endif %}">
+                                <input type="checkbox" name="category" value="{{ cat.slug }}" {% if cat.slug in
+                                    selected_slugs %}checked{% endif %} onchange="this.form.submit()"
+                                    style="display: none;">
+                                <div class="checkbox-indicator">
+                                    {% if cat.slug in selected_slugs %}
+                                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none" stroke="white"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 4L3.5 6.5L9 1" />
+                                    </svg>
+                                    {% endif %}
+                                </div>
+                                <span>{{ cat.name }}</span>
+                            </label>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                {% if selected_slugs %}
+                <a href="."
+                    style="display: inline-block; color: #94a3b8; font-size: 0.875rem; text-decoration: underline; margin-top: 1rem;">Clear
+                    all filters</a>
+                {% endif %}
+            </form>
         </aside>
 
         <!-- Main Grid -->
@@ -78,8 +128,8 @@
             <div class="grid"
                 style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2.5rem;">
                 {% for template in templates %}
-                <div class="card"
-                    style="group; background: white; border-radius: 1rem; overflow: hidden; color: #0f172a; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent; position: relative; display: flex; flex-direction: column;">
+                <div class="card group"
+                    style="background: white; border-radius: 1rem; overflow: hidden; color: #0f172a; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid transparent; position: relative; display: flex; flex-direction: column;">
                     <a href="{% pageurl template %}"
                         style="text-decoration: none; color: inherit; display: block; flex: 1;">
                         {% image template.hero_image fill-800x800 as img %}
@@ -130,6 +180,42 @@
 
     <!-- Inline Styles for Hover Effects -->
     <style>
+        /* Filter Styles */
+        .filter-label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #94a3b8;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .filter-label.checked {
+            color: white;
+        }
+
+        .checkbox-indicator {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #334155;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            transition: all 0.2s;
+        }
+
+        .filter-label.checked .checkbox-indicator {
+            border-color: #60a5fa;
+            background-color: #60a5fa;
+        }
+
+        .filter-label.checked span {
+            font-weight: 600;
+        }
+
         .card:hover {
             transform: translateY(-4px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
