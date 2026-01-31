@@ -1,2 +1,2 @@
-# cursorhack
-shared repo for cursorhack, topic tbd
+# cursorhack - team buzzdevs
+
