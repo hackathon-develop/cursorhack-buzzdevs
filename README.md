@@ -1,6 +1,15 @@
 # cursorhack - team buzzdevs
 
-## Indoor Airport Nav 
+For a view on the complete hackathon end release version also look at https://github.com/hackathon-develop/cursorhack-buzzdevs-gatebuddy-concierge.
+
+Plan was to have a integrated app with airpot navigation, call integration via elevenlabs and attached n8n workflows.
+- the n8n and elevenlab parts were cloud built & hosted and are not documented as source here.  
+- the integration of the elevelabs widget into https://github.com/hackathon-develop/cursorhack-buzzdevs-gatebuddy-concierge worked.
+- the integration of the prepared map component was not started.
+  
+# early info collection
+
+## Indoor Airport Nav  
 
 - https://situm.com/en/developers/rest-apis/
     - waiting for key
