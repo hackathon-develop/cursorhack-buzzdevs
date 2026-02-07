@@ -1,3 +1,5 @@
+***** Archived *****
+
 # cursorhack - team buzzdevs
 
 For a view on the complete hackathon end release version also look at https://github.com/hackathon-develop/cursorhack-buzzdevs-gatebuddy-concierge.
